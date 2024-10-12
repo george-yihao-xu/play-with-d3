@@ -9,7 +9,7 @@ type Chart = d3.Selection<SVGGElement, unknown, null, undefined>;
 export const ProjectConstructionTypeChart = () => {
     const svgRef = useRef<SVGSVGElement>(null);
     const [chart, setChart] = useState<Chart>();
-    const { selectedProject } = useProjectContext();
+    const { selectedProject, setActiveConstructionType } = useProjectContext();
 
     const drawChart = () => {
         const width = 500;
@@ -51,6 +51,10 @@ export const ProjectConstructionTypeChart = () => {
             .attr("d", arc)
             .attr("fill", (d) => {
                 return colors.constructionType[d.data.type as keyof typeof colors.constructionType] || "gray";
+            })
+            .attr("cursor", "pointer")
+            .on("click", (_, d) => {
+                setActiveConstructionType(d.data.type);
             });
 
         // Add the text labels
