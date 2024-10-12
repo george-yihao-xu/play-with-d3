@@ -1,19 +1,22 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import ProjectConstructionTypeChart from './charts/projectConstructionTypeChart'
+import { ConstructionTypeInfo } from './components/ConstructionTypeInfo'
+import ProjectList from './components/ProjectList'
+import { ProjectProvider } from './context/ProjectContext'
+import projects from './dummyData/projects'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
+    <ProjectProvider>
       <div>
         <h1>Project Construction Type Chart</h1>
-        <ProjectConstructionTypeChart />
+        <div style={{ display: "flex", gap: "20px" }}>
+          <ProjectConstructionTypeChart />
+          <ProjectList projects={projects} />
+          <ConstructionTypeInfo />
+        </div>
       </div>
-    </>
+    </ProjectProvider>
   )
 }
 
