@@ -68,7 +68,7 @@ export const ProjectConstructionTypeChart = () => {
             .on("mousemove", (event, d) => {
                 const [x, y] = d3.pointer(event);
                 tooltip.transition()
-                    .duration(100)
+                    // .duration(100)
                     .style("opacity", .9);
                 tooltip.html(`Type: ${d.data.type}<br/>Count: ${d.data.count}`)
                     .style('color', colors.constructionType[d.data.type as keyof typeof colors.constructionType] || "gray")
