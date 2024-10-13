@@ -1,7 +1,7 @@
 export const colors = {
     constructionType: {
         Residential: "#f9824f",
-        Commercial: "#fdc680",
+        Commercial: "#123456",
         Industrial: "#9b99b0",
     },
 };

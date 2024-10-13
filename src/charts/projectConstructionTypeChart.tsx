@@ -8,6 +8,7 @@ type Chart = d3.Selection<SVGGElement, unknown, null, undefined>;
 
 export const ProjectConstructionTypeChart = () => {
     const svgRef = useRef<SVGSVGElement>(null);
+    const tooltipRef = useRef<HTMLDivElement>(null);
     const [chart, setChart] = useState<Chart>();
     const { selectedProject, setActiveConstructionType } = useProjectContext();
 
@@ -40,13 +41,25 @@ export const ProjectConstructionTypeChart = () => {
         // Define the arc generator for the pie chart
         const arc = d3.arc<d3.PieArcDatum<{ type: string, count: number }>>().innerRadius(radius * 0.3).outerRadius(radius)
 
+        // tooltip
+        const tooltip = d3.select(tooltipRef.current)
+            .style("opacity", 0)
+            .attr("class", "tooltip")
+            .style("position", "absolute")
+            .style("background-color", "white")
+            .style("border", "1px solid black")
+            .style("padding", "2px")
+            .style("border-radius", "5px")
+            .style("pointer-events", "none")
+            .style("transition", "opacity 0.2s");
+
         // Append the arcs to the SVG
         const arcs = svg.selectAll(".arc")
             .data(pie(data))
             .enter().append("g")
             .attr("class", "arc");
 
-        // Draw the arcs
+        // Draw the arcs，and add a title/tooltip to each arc
         arcs.append("path")
             .attr("d", arc)
             .attr("fill", (d) => {
@@ -55,6 +68,21 @@ export const ProjectConstructionTypeChart = () => {
             .attr("cursor", "pointer")
             .on("click", (_, d) => {
                 setActiveConstructionType(d.data.type);
+            })
+            .on("mousemove", (event, d) => {
+                const [x, y] = d3.pointer(event);  // 获取鼠标相对于SVG的坐标
+                tooltip.transition()
+                    .duration(100)
+                    .style("opacity", .9);
+                tooltip.html(`Type: ${d.data.type}<br/>Count: ${d.data.count}`)
+                    .style('color', colors.constructionType[d.data.type as keyof typeof colors.constructionType] || "gray")
+                    .style("left", `${x + width / 2}px`)
+                    .style("top", `${y + height / 2}px`);
+            })
+            .on("mouseout", () => {
+                tooltip.transition()
+                    .duration(100)
+                    .style("opacity", 0);
             });
 
         // Add the text labels
@@ -81,7 +109,7 @@ export const ProjectConstructionTypeChart = () => {
     }, []);
 
 
-
+    // highlight
     useEffect(() => {
         const highlightSegment = (constructionType: string | null) => {
             if (!chart) return;
@@ -99,7 +127,10 @@ export const ProjectConstructionTypeChart = () => {
     }, [selectedProject, chart]);
 
 
-    return <svg ref={svgRef}></svg>;
+    return <div style={{ position: "relative" }}>
+        <svg ref={svgRef}></svg>
+        <div ref={tooltipRef} style={{ position: "absolute", pointerEvents: "none" }} />
+    </div>;
 };
 
 export default ProjectConstructionTypeChart;
