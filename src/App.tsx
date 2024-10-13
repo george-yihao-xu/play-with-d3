@@ -1,5 +1,5 @@
 import './App.css'
-import ProjectConstructionTypeChart from './charts/projectConstructionTypeChart'
+import ProjectConstructionTypeChart from './charts/ProjectConstructionTypeChart'
 import { ConstructionTypeInfo } from './components/ConstructionTypeInfo'
 import ProjectList from './components/ProjectList'
 import { ProjectProvider } from './context/ProjectContext'

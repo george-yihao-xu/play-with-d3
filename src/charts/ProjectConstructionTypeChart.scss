@@ -1,0 +1,19 @@
+// ProjectConstructionTypeChart.scss
+
+.project-construction-type-chart {
+    position: relative;
+
+    .arc {
+        cursor: pointer;
+    }
+
+    .tooltip {
+        position: absolute;
+        pointer-events: none;
+        transition: opacity 0.2s;
+        border: 1px solid black;
+        padding: 2px;
+        border-radius: 5px;
+        background-color: white;
+    }
+}

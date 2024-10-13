@@ -1,8 +1,11 @@
+// ProjectConstructionTypeChart.scss
+
 import React, { useEffect, useRef, useState } from "react";
 import { colors } from "../dummyData/colors";
 import { Project, projects } from "../dummyData/projects";
 import * as d3 from "d3";
 import { useProjectContext } from "../context/ProjectContext";
+import "./ProjectConstructionTypeChart.scss";
 
 type Chart = d3.Selection<SVGGElement, unknown, null, undefined>;
 
@@ -45,13 +48,6 @@ export const ProjectConstructionTypeChart = () => {
         const tooltip = d3.select(tooltipRef.current)
             .style("opacity", 0)
             .attr("class", "tooltip")
-            .style("position", "absolute")
-            .style("background-color", "white")
-            .style("border", "1px solid black")
-            .style("padding", "2px")
-            .style("border-radius", "5px")
-            .style("pointer-events", "none")
-            .style("transition", "opacity 0.2s");
 
         // Append the arcs to the SVG
         const arcs = svg.selectAll(".arc")
@@ -70,7 +66,7 @@ export const ProjectConstructionTypeChart = () => {
                 setActiveConstructionType(d.data.type);
             })
             .on("mousemove", (event, d) => {
-                const [x, y] = d3.pointer(event);  // 获取鼠标相对于SVG的坐标
+                const [x, y] = d3.pointer(event);
                 tooltip.transition()
                     .duration(100)
                     .style("opacity", .9);
@@ -127,7 +123,7 @@ export const ProjectConstructionTypeChart = () => {
     }, [selectedProject, chart]);
 
 
-    return <div style={{ position: "relative" }}>
+    return <div className="project-construction-type-chart">
         <svg ref={svgRef}></svg>
         <div ref={tooltipRef} style={{ position: "absolute", pointerEvents: "none" }} />
     </div>;
