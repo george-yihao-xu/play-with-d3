@@ -5,6 +5,7 @@ import ProjectList from './components/ProjectList'
 import { ProjectProvider } from './context/ProjectContext'
 import AreaChart from './charts/AreaChart'
 import projects from './dummyData/projects'
+import { gsfData } from './dummyData/projects'
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
           <ConstructionTypeInfo />
         </section>
         <div>
-          <AreaChart projects={projects} />
+          <AreaChart gsfData={gsfData} />
         </div>
       </div>
     </ProjectProvider>

@@ -1,83 +1,80 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { Project } from '../dummyData/projects';
 import COLORS from '../dummyData/colors';
+import { GSFData } from '../dummyData/projects';
 
 interface AreaChartProps {
-  projects: Project[];
+  gsfData: GSFData;
 }
 
-type DataPt = {
-  date: number;
-  total: number;
-  [key: string]: number;
-}
-
-const AreaChart: React.FC<AreaChartProps> = ({ projects }) => {
+const AreaChart: React.FC<AreaChartProps> = ({ gsfData }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
     if (!svgRef.current) return;
 
-    // Clear previous chart
+    // 清除之前的图表
     d3.select(svgRef.current).selectAll('*').remove();
 
-    // Process data
-    const processedData = processData(projects);
-    const constructionTypes = Array.from(new Set(projects.map(p => p.constructionType)));
+    const constructionTypes = Object.keys(gsfData);
+    const years = gsfData[constructionTypes[0]].length;
 
-    // Set chart dimensions
+    // 设置图表尺寸
     const margin = { top: 20, right: 30, bottom: 30, left: 50 };
     const width = 800 - margin.left - margin.right;
     const height = 400 - margin.top - margin.bottom;
 
-    // Create SVG
+    // 创建 SVG
     const svg = d3.select(svgRef.current)
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Create scales
+    // 创建比例尺
     const x = d3.scaleLinear()
-      .domain(d3.extent(processedData, d => d.date) as [number, number])
+      .domain([0, years - 1])
       .range([0, width]);
 
+    // 计算堆叠后的最大值
+    const stackedData = d3.stack().keys(constructionTypes)(
+      d3.range(years).map(i => {
+        const obj: { [key: string]: number } = { year: i };
+        constructionTypes.forEach(type => {
+          obj[type] = gsfData[type][i];
+        });
+        return obj;
+      })
+    );
+    const yMax = d3.max(stackedData[stackedData.length - 1], d => d[1]) || 0;
+
     const y = d3.scaleLinear()
-      .domain([0, d3.max(processedData, d => d.total) as number])
+      .domain([0, yMax * 1.1]) // 增加 10% 的空间
       .range([height, 0]);
 
-    // Create stack generator
-    const stack = d3.stack()
-      .keys(constructionTypes)
-      .order(d3.stackOrderNone)
-      .offset(d3.stackOffsetNone);
-
-    const stackedData = stack(processedData);
-
-    // Create area generator
-    const area = d3.area<d3.SeriesPoint<DataPt>>()
-      .x(d => x(d.data.date))
+    // 创建面积生成器
+    const area = d3.area<d3.SeriesPoint<{ [key: string]: number }>>()
+      .x((d, i) => x(i))
       .y0(d => y(d[0]))
-      .y1(d => y(d[1]))
+      .y1(d => y(d[1]));
 
-    // Draw stacked areas
+    // 绘制堆叠面积
     svg.selectAll("path")
       .data(stackedData)
       .join("path")
-      .attr("fill", (d) => COLORS.constructionType[d.key as keyof typeof COLORS.constructionType])
-      .attr("d", area as unknown as string);
+      .attr("fill", (d) => COLORS.spaceType[d.key as keyof typeof COLORS.spaceType])
+      .attr("d", area);
 
-    // Add x-axis
+    // 添加 x 轴
     svg.append('g')
       .attr('transform', `translate(0,${height})`)
-      .call(d3.axisBottom(x).tickFormat(d3.format('d')));
+      .call(d3.axisBottom(x).ticks(5).tickFormat((d, i) => `Year ${i + 1}`));
 
-    // Add y-axis
+    // 添加 y 轴
     svg.append('g')
       .call(d3.axisLeft(y));
 
-    // Add legend
+    // 添加图例
     const legend = svg.selectAll('.legend')
       .data(constructionTypes)
       .enter()
@@ -90,7 +87,7 @@ const AreaChart: React.FC<AreaChartProps> = ({ projects }) => {
       .attr('width', 18)
       .attr('height', 18)
       .style('stroke', 'white')
-      .style('fill', (d) => COLORS.constructionType[d as keyof typeof COLORS.constructionType]);
+      .style('fill', (d) => COLORS.spaceType[d as keyof typeof COLORS.spaceType]);
 
     legend.append('text')
       .attr('x', width - 24)
@@ -99,89 +96,9 @@ const AreaChart: React.FC<AreaChartProps> = ({ projects }) => {
       .style('text-anchor', 'end')
       .text(d => d);
 
-  }, [projects]);
+  }, [gsfData]);
 
   return <svg ref={svgRef}></svg>;
 };
-
-// Helper fn to fill missing years
-const fillMissingYears = (gsfChanges: Project['gsfChanges']) => {
-  const filledChanges = [...gsfChanges].sort((a, b) => a.date - b.date);
-  const result: Project['gsfChanges'] = [];
-  const startYear = 2021;
-  const endYear = 2023;
-
-  if (gsfChanges.length === 0) {
-    return result;
-  }
-
-  // if missing the first year
-  if (filledChanges[0].date > startYear) {
-    result.push({ date: startYear, value: 0 });
-  }
-
-  for (let year = startYear; year <= endYear; year++) {
-    const change = filledChanges.find(c => c.date === year);
-    if (change) {
-      result.push(change);
-    } else {
-      result.push({ date: year, value: result[result.length - 1].value });
-    }
-  }
-
-  console.log('--filled project', result);
-
-  return result;
-}
-
-// Helper function to process data
-function processData(projects: Project[]) {
-  const _projects = projects.map(project => {
-    return {
-      ...project,
-      gsfChanges: fillMissingYears(project.gsfChanges),
-    };
-  });
-
-  console.log('--processed project', _projects);
-
-  const yearSet = new Set<number>();
-  _projects.forEach(project => {
-    project.gsfChanges.forEach(change => yearSet.add(change.date));
-  });
-  const years = Array.from(yearSet).sort((a, b) => a - b);
-
-  // make sure all years are included
-  const fullYears = [];
-  for (let year = years[0]; year <= years[years.length - 1]; year++) {
-    fullYears.push(year);
-  }
-
-  const result = fullYears.map(year => {
-    const dataPoint: { date: number; total: number; [key: string]: number } = { date: year, total: 0 };
-    
-    let total = 0;
-
-    // iterate over each project
-    _projects.forEach(proj => {
-      const changes = proj.gsfChanges.filter(c => c.date === year);
-      changes.forEach(change => {
-        if (dataPoint[proj.constructionType] === undefined) {
-          dataPoint[proj.constructionType] = 0;
-        }
-        dataPoint[proj.constructionType] += change.value;
-        total += change.value;
-      });
-    });
-
-    dataPoint.total = total;
-
-    return dataPoint;
-  });
-
-  console.log('--result', result);
-
-  return result;
-}
 
 export default AreaChart;

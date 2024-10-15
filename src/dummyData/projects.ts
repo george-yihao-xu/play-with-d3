@@ -102,4 +102,12 @@ export const projects: Project[] = [
   },
 ];
 
+export const gsfData = {
+  'special':  [1,1,3,4,5],
+  'regular': [1,2,3,4,5],
+  'other': [2,2,3,4,5]
+}
+
+export type GSFData = typeof gsfData;
+
 export default projects;
