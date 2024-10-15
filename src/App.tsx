@@ -11,11 +11,11 @@ function App() {
     <ProjectProvider>
       <div>
         <h1>Project Construction Type Chart</h1>
-        <div style={{ display: "flex", width: "100%", gap: "10px" }}>
+        <section className='main-container'>
           <ProjectConstructionTypeChart />
           <ProjectList projects={projects} />
           <ConstructionTypeInfo />
-        </div>
+        </section>
         <div>
           <AreaChart projects={projects} />
         </div>

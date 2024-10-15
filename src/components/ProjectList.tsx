@@ -10,7 +10,7 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
     const { selectedProject, setSelectedProject, setActiveConstructionType } = useProjectContext();
 
 
-    return <div style={{ width: "300px", display: "flex", flexDirection: "column", gap: "10px" }}>
+    return <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "10px" }}>
         <h2>Project List</h2>
         <p>Click on a project to select it</p>
         <p>Selected Project: <b>{selectedProject?.name}</b>, whose construction type is <b style={{ color: colors.constructionType[selectedProject?.constructionType as keyof typeof colors.constructionType] }}>{selectedProject?.constructionType}</b></p>
