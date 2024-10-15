@@ -3,6 +3,7 @@ import ProjectConstructionTypeChart from './charts/ProjectConstructionTypeChart'
 import { ConstructionTypeInfo } from './components/ConstructionTypeInfo'
 import ProjectList from './components/ProjectList'
 import { ProjectProvider } from './context/ProjectContext'
+import AreaChart from './charts/AreaChart'
 import projects from './dummyData/projects'
 
 function App() {
@@ -14,6 +15,9 @@ function App() {
           <ProjectConstructionTypeChart />
           <ProjectList projects={projects} />
           <ConstructionTypeInfo />
+        </div>
+        <div>
+          <AreaChart projects={projects} />
         </div>
       </div>
     </ProjectProvider>
