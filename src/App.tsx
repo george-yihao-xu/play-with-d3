@@ -11,7 +11,7 @@ function App() {
     <ProjectProvider>
       <div>
         <h1>Project Construction Type Chart</h1>
-        <div style={{ display: "flex", gap: "20px" }}>
+        <div style={{ display: "flex", width: "100%", gap: "10px" }}>
           <ProjectConstructionTypeChart />
           <ProjectList projects={projects} />
           <ConstructionTypeInfo />

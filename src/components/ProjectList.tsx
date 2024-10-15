@@ -20,7 +20,15 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
                     setSelectedProject(project);
                     setActiveConstructionType(project.constructionType);
                 }}>
-                    {project.name} - {project.constructionType} - {project.id}
+                    <div>
+                        <span>{project.id};</span>
+                        <span>{project.name};</span>
+                        <span style={{ color: colors.constructionType[project.constructionType as keyof typeof colors.constructionType] }}>
+                            {project.constructionType};
+                        </span>
+                        <span>{project.gsfChanges.map((change) => change.value).join(">")}</span>
+                    </div>
+
                 </li>
             ))}
         </ul>
